@@ -13,8 +13,8 @@ def calculate_determinant(list_of_lists):
     :param list_of_lists: список списков - исходная матрица
     :return: значение определителя или None
     '''
-    for raw in list_of_lists:
-        if (len(raw) != len(list_of_lists) or len(list_of_lists) == 0):
+    for row in list_of_lists:
+        if (len(row) != len(list_of_lists) or len(list_of_lists) == 0):
             return None
 
         if (len(list_of_lists) == 1):
@@ -27,15 +27,15 @@ def calculate_determinant(list_of_lists):
             return buff_list[0][0]*buff_list[1][1] \
                 - buff_list[0][1]*buff_list[1][0]
         else:
-            raw_1 = buff_list[0]
+            row_1 = buff_list[0]
 
-            for i in range(len(raw_1)):
+            for i in range(len(row_1)):
                 next_list = buff_list[1::]
-                for raw in next_list:
-                    raw_copy = copy.deepcopy(raw)
-                    raw_copy.pop(i)
-                    next_list[next_list.index(raw)] = raw_copy
-                det += ((-1)**i) * raw_1[i] * det_function(next_list)
+                for row in next_list:
+                    row_copy = copy.deepcopy(row)
+                    row_copy.pop(i)
+                    next_list[next_list.index(row)] = row_copy
+                det += ((-1)**i) * row_1[i] * det_function(next_list)
             return det
 
     return det_function(list_of_lists)
