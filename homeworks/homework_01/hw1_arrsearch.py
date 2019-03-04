@@ -13,4 +13,8 @@ def find_indices(input_list, n):
     :param n: целевая сумма
     :return: tuple из двух индексов или None
     '''
-    raise NotImplementedError
+    for number in input_list:
+        if ((n-number) in input_list) and \
+                (input_list.index(number) != input_list.index(n-number)):
+            return (input_list.index(n-number), input_list.index(number))
+    return None
