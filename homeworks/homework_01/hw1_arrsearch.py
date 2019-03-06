@@ -13,8 +13,11 @@ def find_indices(input_list, n):
     :param n: целевая сумма
     :return: tuple из двух индексов или None
     '''
-    for number in input_list:
-        if ((n-number) in input_list) and \
-                (input_list.index(number) != input_list.index(n-number)):
-            return (input_list.index(n-number), input_list.index(number))
+    res_dict = {}
+    for i in range(len(input_list)):
+        if (input_list[i] in res_dict):
+            res_dict[input_list[i]] += [i]
+            return tuple(res_dict[input_list[i]])
+        else:
+            res_dict[n-input_list[i]] = [i]
     return None
