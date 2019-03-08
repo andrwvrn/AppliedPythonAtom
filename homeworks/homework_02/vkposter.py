@@ -9,7 +9,11 @@ from homeworks.homework_02.fastmerger import FastSortedListMerger
 class VKPoster:
 
     def __init__(self):
-        raise NotImplementedError
+        self._posted_posts = {}
+        self._read_posts = {}
+        self._followed_for = {}
+        self._recent_posts = {}
+        self._popularity = {}
 
     def user_posted_post(self, user_id: int, post_id: int):
         '''
@@ -19,7 +23,10 @@ class VKPoster:
         :param post_id: id поста. Число.
         :return: ничего
         '''
-        pass
+        if (self._posted_posts.get(user_id)):
+            self._posted_posts[user_id].append(post_id)
+        else:
+            self._posted_posts[user_id] = [post_id]
 
     def user_read_post(self, user_id: int, post_id: int):
         '''
@@ -29,7 +36,11 @@ class VKPoster:
         :param post_id: id поста. Число.
         :return: ничего
         '''
-        pass
+        if (self._read_posts.get(user_id) and post_id
+                not in self._read_posts.get(user_id)):
+            self._read_posts[user_id].append(post_id)
+        elif (not self._read_posts.get(user_id)):
+            self._read_posts[user_id] = [post_id]
 
     def user_follow_for(self, follower_user_id: int, followee_user_id: int):
         '''
@@ -39,7 +50,10 @@ class VKPoster:
         :param followee_user_id: id пользователя. Число.
         :return: ничего
         '''
-        pass
+        if (self._followed_for.get(follower_user_id)):
+            self._followed_for[follower_user_id].append(followee_user_id)
+        else:
+            self._followed_for[follower_user_id] = [followee_user_id]
 
     def get_recent_posts(self, user_id: int, k: int)-> list:
         '''
@@ -50,7 +64,13 @@ class VKPoster:
         :return: Список из post_id размером К из свежих постов в
         ленте пользователя. list
         '''
-        pass
+        self._recent_posts[user_id] = []
+
+        for user in self._followed_for[user_id]:
+            if (self._posted_posts.get(user)):
+                self._recent_posts[user_id] += self._posted_posts[user]
+        self._recent_posts[user_id] = sorted(self._recent_posts[user_id])[::-1]
+        return self._recent_posts[user_id][:k]
 
     def get_most_popular_posts(self, k: int) -> list:
         '''
@@ -60,4 +80,16 @@ class VKPoster:
         необходимо вывести. Число.
         :return: Список из post_id размером К из популярных постов. list
         '''
-        pass
+        self._popularity = {}
+        for user_id in self._read_posts:
+            for post_id in self._read_posts[user_id]:
+                if (post_id in self._popularity):
+                    self._popularity[post_id] += 1
+                else:
+                    self._popularity[post_id] = 1
+
+        sorted_posts = sorted(self._popularity.items(),
+                              key=lambda id_and_pop:
+                              (id_and_pop[1], id_and_pop[0]))
+
+        return [post[0] for post in sorted_posts[::-1][:k]]
