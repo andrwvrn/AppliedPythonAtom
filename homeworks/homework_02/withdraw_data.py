@@ -2,6 +2,22 @@
 
 import json
 import csv
+import copy
+
+
+def test_data(table):
+    s = ''
+    length = -1
+    for row in table:
+        if (len(row) != length and length != -1):
+            print("Формат не валиден")
+            raise SystemExit
+        length = len(row)
+        l = copy.deepcopy(row)
+        s += ''.join(l)
+    if len(s) == 0:
+        print("Формат не валиден")
+        raise SystemExit
 
 
 def receive_data(filename, enc, frmt):
@@ -26,5 +42,6 @@ def receive_data(filename, enc, frmt):
             data = csv.reader(f, delimiter='\t')
             for row in data:
                 table.append(row)
+    test_data(table)
 
     return table

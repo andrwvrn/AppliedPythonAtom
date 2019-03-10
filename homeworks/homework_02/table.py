@@ -9,13 +9,15 @@ if __name__ == '__main__':
     try:
         filename = sys.argv[1]
     except IndexError:
-        raise SystemExit('Please enter a filename')
+        print('Файл не валиден')
+        raise SystemExit
 
     try:
         with open(filename, 'rb') as f:
             pass
     except FileNotFoundError:
-        raise SystemExit('File is not valid')
+        print('Файл не валиден')
+        raise SystemExit
 
     enc = ce.check_e(filename)
     frmt = cf.check_f(filename, enc)
