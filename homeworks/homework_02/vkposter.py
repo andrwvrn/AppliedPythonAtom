@@ -12,8 +12,6 @@ class VKPoster:
         self._posted_posts = {}
         self._read_posts = {}
         self._followed_for = {}
-        self._recent_posts = {}
-        self._popularity = {}
 
     def user_posted_post(self, user_id: int, post_id: int):
         '''
@@ -64,13 +62,13 @@ class VKPoster:
         :return: Список из post_id размером К из свежих постов в
         ленте пользователя. list
         '''
-        self._recent_posts[user_id] = []
+        recent_posts = []
 
-        for user in self._followed_for[user_id]:
-            if (self._posted_posts.get(user)):
-                self._recent_posts[user_id] += self._posted_posts[user]
-        self._recent_posts[user_id] = sorted(self._recent_posts[user_id])[::-1]
-        return self._recent_posts[user_id][:k]
+        for followee in self._followed_for[user_id]:
+            if (self._posted_posts.get(followee)):
+                recent_posts.append(sorted(self._posted_posts[followee]))
+
+        return FastSortedListMerger.merge_first_k(recent_posts, k)
 
     def get_most_popular_posts(self, k: int) -> list:
         '''
@@ -80,16 +78,18 @@ class VKPoster:
         необходимо вывести. Число.
         :return: Список из post_id размером К из популярных постов. list
         '''
-        self._popularity = {}
+        popularity = {}
         for user_id in self._read_posts:
             for post_id in self._read_posts[user_id]:
-                if (post_id in self._popularity):
-                    self._popularity[post_id] += 1
+                if (post_id in popularity):
+                    popularity[post_id] += 1
                 else:
-                    self._popularity[post_id] = 1
+                    popularity[post_id] = 1
 
-        sorted_posts = sorted(self._popularity.items(),
-                              key=lambda id_and_pop:
-                              (id_and_pop[1], id_and_pop[0]))
+        pop_and_recent = [(value, key) for (key, value) in popularity.items()]
 
-        return [post[0] for post in sorted_posts[::-1][:k]]
+        pop_heap = MaxHeap(pop_and_recent)
+        popular_posts = []
+        for i in range(k):
+            popular_posts.append(pop_heap.extract_maximum())
+        return [post[1] for post in popular_posts]
