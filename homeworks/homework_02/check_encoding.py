@@ -9,4 +9,5 @@ def check_e(filename):
                 return enc
         except (UnicodeDecodeError, UnicodeError):
             pass
-    raise SystemExit('Файл не валиден')
+
+    raise SystemExit

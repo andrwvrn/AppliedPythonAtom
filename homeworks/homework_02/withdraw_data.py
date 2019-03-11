@@ -10,13 +10,11 @@ def test_data(table):
     length = -1
     for row in table:
         if (len(row) != length and length != -1):
-            print("Формат не валиден")
             raise SystemExit
         length = len(row)
         l = copy.deepcopy(row)
         s += ''.join(l)
     if len(s) == 0:
-        print("Формат не валиден")
         raise SystemExit
 
 
@@ -27,8 +25,14 @@ def receive_data(filename, enc, frmt):
             data = json.load(f)
             table_header = []
             table_content = []
-            for column_name in data[0]:
+
+            for column_name in data[0]:     # get table header from first dict
                 table_header.append(column_name)
+
+            for content in data:            # every row has same header
+                if list(content.keys()) != table_header:
+                    raise SystemExit
+
             table.append(table_header)
             for content in data:
                 table_content = [value for value in content.values()]

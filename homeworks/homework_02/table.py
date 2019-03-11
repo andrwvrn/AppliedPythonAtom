@@ -19,10 +19,15 @@ if __name__ == '__main__':
         print('Файл не валиден')
         raise SystemExit
 
-    enc = ce.check_e(filename)
-    frmt = cf.check_f(filename, enc)
-    data = wd.receive_data(filename, enc, frmt)
-    table = ct.draw_table(data)
+    try:
 
-    for row in table:
-        print(''.join(row))
+        enc = ce.check_e(filename)
+        frmt = cf.check_f(filename, enc)
+        data = wd.receive_data(filename, enc, frmt)
+        table = ct.draw_table(data)
+
+        for row in table:
+            print(''.join(row))
+
+    except SystemExit:
+        print("Формат не валиден")

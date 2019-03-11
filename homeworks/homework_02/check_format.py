@@ -18,7 +18,6 @@ def check_f(filename, enc):
         length = -1
         for row in data:
             if (len(row) != length and length != -1):
-                print('Формат не валиден')
                 raise SystemExit
             length = len(row)
     return 'tsv'
