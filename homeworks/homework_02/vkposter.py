@@ -91,5 +91,8 @@ class VKPoster:
         pop_heap = MaxHeap(pop_and_recent)
         popular_posts = []
         for i in range(k):
-            popular_posts.append(pop_heap.extract_maximum())
+            if (len(pop_heap._heap) != 0):
+                popular_posts.append(pop_heap.extract_maximum())
+            else:
+                break
         return [post[1] for post in popular_posts]
