@@ -1,6 +1,8 @@
 #!/usr/bin/env python
 # coding: utf-8
 
+import collections
+
 
 def groupping_anagramms(words):
     """
@@ -23,4 +25,21 @@ def groupping_anagramms(words):
     :return: list of lists of words
     """
     # TODO: реализовать функцию
-    raise NotImplementedError
+
+    dict_of_anagramms = collections.OrderedDict()
+    list_of_lists = []
+
+    for word in words:
+        dict_of_anagramms[''.join(sorted(word.lower()))] = []
+
+    for word in words:
+        sample = ''.join(sorted(word.lower()))
+        if sample in dict_of_anagramms:
+            dict_of_anagramms[sample].append(word)
+        else:
+            continue
+
+    for value in dict_of_anagramms.values():
+        list_of_lists.append(value)
+
+    return list_of_lists
