@@ -1,6 +1,9 @@
 #!/usr/bin/env python
 # coding: utf-8
 
+import os
+import shutil
+
 
 class Requester:
     '''
@@ -29,21 +32,35 @@ class RemoteFileReader(Requester):
         return super().post(self._host, self._port, filename, data)
 
 
+class LocalFileReader(RemoteFileReader):
+
+    def read_file(self, filename):
+        with open("homeworks/homework_03/test_dir/filename.tmp", "r") as f:
+            data = f.readline()
+            return data
+
+    def write_file(self, filename, data):
+        with open("tmpf/filename.tmp", "w") as f:
+            f.write(''.join(data))
+
+
 class OrdinaryFileWorker(RemoteFileReader):
     '''
     Класс, который работает как с локальными
      так и с удаленными файлами
     '''
     def transfer_to_remote(self, filename):
-        with open(filename, "r") as f:
+        read_from = "homeworks/homework_03/test_dir/" + filename
+        with open(read_from, "r") as f:
             super().write_file(filename, f.readlines())
 
     def transfer_to_local(self, filename):
-        with open(filename, "w") as f:
+        write_to = "tmpf/filename"
+        with open(write_to, "w") as f:
             f.write(super().read_file(filename))
 
 
-class MockOrdinaryFileWorker(OrdinaryFileWorker):
+class MockOrdinaryFileWorker(OrdinaryFileWorker, LocalFileReader):
     '''
     Необходимо отнаследовать данный класс так, чтобы
      он вместо запросов на удаленный сервер:
@@ -58,7 +75,11 @@ class MockOrdinaryFileWorker(OrdinaryFileWorker):
      если еще не создана
     '''
     def __init__(self):
-        raise NotImplementedError
+        if ('tmpf' not in os.listdir('.')):
+            os.mkdir('tmpf')
+
+    def __del__(self):
+        shutil.rmtree('tmpf')
 
 
 class LLNode:
