@@ -30,6 +30,9 @@ def LRUCacheDecorator(maxsize=None, ttl=None):
                 self._cache.clear()
                 self._size = 0
 
+            if (maxsize <= 0):
+                return self._func(*args, **kwargs)
+
             key = args
             kw = None
             if (kwargs):
