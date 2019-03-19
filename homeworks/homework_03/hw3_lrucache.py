@@ -21,17 +21,17 @@ def LRUCacheDecorator(maxsize=None, ttl=None):
             self._ttl = ttl
             self._cache = collections.OrderedDict()
             self._func = func
-            self._t_end = None
 
         def __call__(self, *args, **kwargs):
             # TODO вызов функции
-            if (self._ttl and self._t_end and
-                    time.time() - self._t_end >= self._ttl):
-                self._cache.clear()
-                self._size = 0
 
             if (maxsize <= 0):
                 return self._func(*args, **kwargs)
+
+            for key in self._cache.keys():
+                if (self._ttl and time.time() - self._cache[key][1] >= self._ttl):
+                    self._cache.pop(key)
+                    self._size -= 1
 
             key = args
             kw = None
@@ -41,18 +41,16 @@ def LRUCacheDecorator(maxsize=None, ttl=None):
 
             if (not self._cache.get(key)):
                 if (self._size != maxsize):
-                    self._cache[key] = self._func(*args, **kwargs)
+                    self._cache[key] = (self._func(*args, **kwargs), time.time())
                     self._size += 1
                 else:
                     self._cache.popitem(last=False)
-                    self._cache[key] = self._func(*args, **kwargs)
+                    self._cache[key] = (self._func(*args, **kwargs), time.time())
 
-                self._t_end = time.time()
-                return self._cache[key]
+                return self._cache[key][0]
 
             else:
                 self._cache[key] = self._cache.pop(key)
-                self._t_end = time.time()
-                return self._cache[key]
+                return self._cache[key][0]
 
     return LRUCacheDecClass
