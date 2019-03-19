@@ -41,16 +41,17 @@ def LRUCacheDecorator(maxsize=None, ttl=None):
 
             if (not self._cache.get(key)):
                 if (self._size != maxsize):
-                    self._cache[key] = (self._func(*args, **kwargs), time.time())
+                    self._cache[key] = [self._func(*args, **kwargs), time.time()]
                     self._size += 1
                 else:
                     self._cache.popitem(last=False)
-                    self._cache[key] = (self._func(*args, **kwargs), time.time())
+                    self._cache[key] = [self._func(*args, **kwargs), time.time()]
 
                 return self._cache[key][0]
 
             else:
                 self._cache[key] = self._cache.pop(key)
+                self._cache[key][1] = time.time()
                 return self._cache[key][0]
 
     return LRUCacheDecClass
