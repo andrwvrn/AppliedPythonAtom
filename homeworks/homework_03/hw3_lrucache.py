@@ -25,7 +25,7 @@ def LRUCacheDecorator(maxsize=None, ttl=None):
         def __call__(self, *args, **kwargs):
             # TODO вызов функции
 
-            if (maxsize <= 0):
+            if (maxsize and maxsize <= 0):
                 return self._func(*args, **kwargs)
 
             for key in self._cache.keys():
