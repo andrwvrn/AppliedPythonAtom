@@ -1,7 +1,7 @@
 import re
 import csv
 from bs4 import BeautifulSoup
-from collections import OrderedDict
+from collections import Counter, OrderedDict
 
 import asyncio
 import aiohttp
@@ -19,12 +19,10 @@ async def process_html(q: asyncio.Queue) -> tuple:
     html = BeautifulSoup(text, 'html.parser')
     list_of_users = [re.sub(r'<.+?>', '', str(user)) for user in html.findAll('span',
                      attrs={'class': 'user-info__nickname_comment'})]
-    comment_dict = dict.fromkeys(list_of_users, None)
-    for user in comment_dict:
-        comment_dict[user] = list_of_users.count(user)
+    comment_dict = OrderedDict(Counter(list_of_users).most_common())
 
     q.task_done()
-    return (link, OrderedDict(sorted(comment_dict.items(), key=lambda kv: kv[1], reverse=True)))
+    return (link, comment_dict)
 
 
 def write_to_csv(filename: str, res: list) -> None:
