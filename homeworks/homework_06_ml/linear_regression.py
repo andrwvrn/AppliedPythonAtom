@@ -3,12 +3,11 @@
 
 import numpy as np
 import numpy.ma as ma
-import sklearn
 
 
 class NotFittedError(Exception):
     def __init__(self):
-        message= "Data is not fitted yet. Call 'fit' method before using this method."
+        message = "Data is not fitted yet. Call 'fit' method before using this method."
         Exception.__init__(self, message)
 
 
@@ -40,7 +39,7 @@ class LinearRegression:
 
         if (X_train.shape[0] != y_train.shape[0]):
             raise ValueError(f"Found input variables with inconsistent numbers of"
-                             f" samples: {X_train.shape[0]} != {len(y_train)}.")            
+                             f" samples: {X_train.shape[0]} != {len(y_train)}.")
         else:
             # избавимся от признаков с нулевым разбросом, так как они неинформативны
             zero_std = np.where(np.std(X_train, axis=0) == 0)[0]
@@ -81,7 +80,6 @@ class LinearRegression:
             self._coef = self._coef.flatten()
             for i in zero_std:
                 self._coef = np.insert(self._coef, i, 0)
-
 
     def predict(self, X_test):
         """
