@@ -16,6 +16,7 @@ def logloss(y_true, y_pred, eps=1e-15):
     loss = -np.sum(y_true * np.log(y_pred) + (1 - y_true) * np.log(1 - y_pred)) / y_true.shape[0]
     return loss
 
+
 def accuracy(y_true, y_pred):
     """
     Accuracy
@@ -35,6 +36,7 @@ def presicion(y_true, y_pred):
     """
     true_positive = np.sum(y_pred[y_true == 1])
     return true_positive / np.sum(y_pred)
+
 
 def recall(y_true, y_pred):
     """
