@@ -3,6 +3,7 @@
 
 
 import numpy as np
+import pandas as pd
 
 
 class NotFittedError(Exception):
@@ -12,7 +13,7 @@ class NotFittedError(Exception):
 
 
 class LogisticRegression:
-    def __init__(self, lambda_coef=1.0, regularization=None, alpha=0.5):
+    def __init__(self, lambda_coef=0.5, regularization=None, alpha=0.5):
         """
         LogReg for Binary case
         :param lambda_coef: constant coef for gradient descent step
@@ -28,29 +29,31 @@ class LogisticRegression:
         self._alpha = alpha
         self._coef = None
 
-    def fit(self, X_train, y_train, delta=0.00001, n_iters=100000, coef_rand_seed=22):
+    def fit(self, X_train, y_train, delta=0.00001, n_iters=100000, coef_rand_seed=222):
         """
         Fit model using gradient descent method
         :param X_train: training data
         :param y_train: target values for training data
         :return: None
         """
-        if (y_train.ndim == 1):
-            y_train = y_train[:, None]
-
         if (X_train.shape[0] != y_train.shape[0]):
             raise ValueError(f"Found input variables with inconsistent numbers of"
                              f" samples: {X_train.shape[0]} != {len(y_train)}.")
+
         else:
+            y_train = pd.get_dummies(y_train)
+
             zero_std = np.where(np.std(X_train, axis=0) == 0)[0]
             X_train = np.delete(X_train, zero_std, axis=1)
             X_train = (X_train - np.mean(X_train, axis=0)) / np.std(X_train, axis=0)
 
             X_train = np.hstack((np.ones((X_train.shape[0], 1)), X_train))
+            # n - number of features, k - number of target classes
             m, n = X_train.shape
+            k = y_train.shape[1]
 
             r = np.random.RandomState(coef_rand_seed)
-            self._coef = r.normal(-1, 1, (n, 1))
+            self._coef = r.normal(-1, 1, (n, k))
 
             y_hat = None
             prev = None
@@ -61,23 +64,22 @@ class LogisticRegression:
                     break
                 else:
                     prev = self._coef
-                    y_hat = 1 / (1 + np.exp(-(X_train @ self._coef)))
+                    denominator = np.sum(np.exp(X_train @ self._coef), axis=1)
+                    y_hat = np.exp(X_train @ self._coef) / denominator[:, None]
                     if (self._reg == 'L2'):
-                        reg_term = 2*np.sum(self._coef, axis=1) / m
-                        reg_term = reg_term[:, None]
+                        reg_term = 2*np.sum(self._coef, axis=0)
                     elif (self._reg == 'L1'):
-                        reg_term = (np.sum(self._coef > 0, axis=1) - np.sum(self._coef < 0, axis=1))
-                        reg_term = reg_term[:, None]
+                        reg_term = (np.sum(self._coef > 0, axis=0) - np.sum(self._coef < 0, axis=0))
+
                     grad = X_train.T @ (y_hat - y_train) / m + self._alpha * reg_term / m
                     self._coef = self._coef - self._lambda_coef * grad
                     continue
 
             self._intercept = self._coef[0]
-            self._coef = np.delete(self._coef, 0)
+            self._coef = np.delete(self._coef, 0, axis=0)
 
-            self._coef = self._coef.flatten()
             for i in zero_std:
-                self._coef = np.insert(self._coef, i, 0)
+                self._coef = np.insert(self._coef, i, np.zeros(k), axis=0)
 
     def predict(self, X_test, threshold=0.5):
         """
@@ -86,8 +88,9 @@ class LogisticRegression:
         :return: y_test: predicted values
         """
         if (self._coef is not None):
-            sigma = 1 / (1 + np.exp(-(X_test @ self._coef + self._intercept)))
-            pred = (sigma > threshold).astype(int)
+            denominator = np.sum(np.exp(X_test @ self._coef + self._intercept.reshape(1,-1)), axis=1)
+            probs = np.exp(X_test @ self._coef + self._intercept.reshape(1,-1)) / denominator[:, None]
+            pred =  np.argmax(probs, axis=1)
             return pred
         else:
             raise NotFittedError
@@ -99,7 +102,9 @@ class LogisticRegression:
         :return: y_test: predicted probabilities
         """
         if (self._coef is not None):
-            return 1 / (1 + np.exp(-(X_test @ self._coef + self._intercept)))
+            denominator = np.sum(np.exp(X_test @ self._coef + self._intercept.reshape(1,-1)), axis=1)
+            probs = np.exp(X_test @ self._coef + self._intercept.reshape(1,-1)) / denominator[:, None]
+            return probs
         else:
             raise NotFittedError
 
