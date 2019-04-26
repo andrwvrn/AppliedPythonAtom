@@ -88,9 +88,9 @@ class LogisticRegression:
         :return: y_test: predicted values
         """
         if (self._coef is not None):
-            denominator = np.sum(np.exp(X_test @ self._coef + self._intercept.reshape(1,-1)), axis=1)
-            probs = np.exp(X_test @ self._coef + self._intercept.reshape(1,-1)) / denominator[:, None]
-            pred =  np.argmax(probs, axis=1)
+            denominator = np.sum(np.exp(X_test @ self._coef + self._intercept.reshape(1, -1)), axis=1)
+            probs = np.exp(X_test @ self._coef + self._intercept.reshape(1, -1)) / denominator[:, None]
+            pred = np.argmax(probs, axis=1)
             return pred
         else:
             raise NotFittedError
@@ -102,8 +102,8 @@ class LogisticRegression:
         :return: y_test: predicted probabilities
         """
         if (self._coef is not None):
-            denominator = np.sum(np.exp(X_test @ self._coef + self._intercept.reshape(1,-1)), axis=1)
-            probs = np.exp(X_test @ self._coef + self._intercept.reshape(1,-1)) / denominator[:, None]
+            denominator = np.sum(np.exp(X_test @ self._coef + self._intercept.reshape(1, -1)), axis=1)
+            probs = np.exp(X_test @ self._coef + self._intercept.reshape(1, -1)) / denominator[:, None]
             return probs
         else:
             raise NotFittedError
