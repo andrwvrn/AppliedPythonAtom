@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 # coding: utf-8
+import numpy as np
 
 
 class KNNRegressor:
@@ -7,12 +8,12 @@ class KNNRegressor:
     Построим регрессию с помощью KNN. Классификацию писали на паре
     """
 
-    def __init__(self, n):
+    def __init__(self, n=5):
         '''
         Конструктор
         :param n: число ближайших соседей, которые используются
         '''
-        raise NotImplementedError
+        self._n = n
 
     def fit(self, X, y):
         '''
@@ -20,7 +21,8 @@ class KNNRegressor:
         :param y: целевая переменная, матрица размерности (num_obj, 1)
         :return: None
         '''
-        raise NotImplementedError
+        self._X_train = X
+        self._y_train = y
 
     def predict(self, X):
         '''
@@ -28,18 +30,16 @@ class KNNRegressor:
         :return: вектор предсказаний, матрица размерности (num_test_obj, 1)
         '''
 
-        raise NotImplementedError
-
         y = []
         assert len(X.shape) == 2
         for t in X:
             # Посчитаем расстояние от всех элементов в тренировочной выборке
             # до текущего примера -> результат - вектор размерности трейна
-            # TODO d =
+            d = np.sqrt(np.sum((self._X_train - t)**2, axis=1))
             # Возьмем индексы n элементов, расстояние до которых минимально
             # результат -> вектор из n элементов
-            # TODO idx =
-            # TODO
-            prediction = None
+            idx = np.argsort(d)[:self._n]
+            y_nearest = self._y_train[idx]
+            prediction = np.mean(y_nearest)
             y.append(prediction)
         return y
