@@ -45,7 +45,6 @@ class LogisticRegression:
 
             zero_std = np.where(np.std(X_train, axis=0) == 0)[0]
             X_train = np.delete(X_train, zero_std, axis=1)
-            X_train = (X_train - np.mean(X_train, axis=0)) / np.std(X_train, axis=0)
 
             X_train = np.hstack((np.ones((X_train.shape[0], 1)), X_train))
             # n - number of features, k - number of target classes
