@@ -27,7 +27,7 @@ class LinearRegression:
         self._alpha = alpha
         self._coef = None
 
-    def fit(self, X_train, y_train, n_iters=100000, eps=0.00001, seed = 22):
+    def fit(self, X_train, y_train, n_iters=100000, eps=0.00001, seed=22):
         """
         Fit model using gradient descent method
         :param X_train: training data
