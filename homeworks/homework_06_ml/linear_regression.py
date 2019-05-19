@@ -27,7 +27,7 @@ class LinearRegression:
         self._alpha = alpha
         self._coef = None
 
-    def fit(self, X_train, y_train):
+    def fit(self, X_train, y_train, n_iters=100000, eps=0.00001, seed = 22):
         """
         Fit model using gradient descent method
         :param X_train: training data
@@ -51,15 +51,14 @@ class LinearRegression:
             m, n = X_train.shape
 
             # нагенерим коэффициенты
-            seed = 22
             r = np.random.RandomState(seed)
             self._coef = r.normal(-1, 1, (n, 1))
 
             prev = None
             reg_term = 0
 
-            for _ in range(100000):
-                if (prev is not None and np.all(np.absolute(self._coef - prev) < 0.00001)):
+            for _ in range(n_iters):
+                if (prev is not None and np.all(np.absolute(self._coef - prev) < eps)):
                     break
                 else:
                     prev = self._coef
